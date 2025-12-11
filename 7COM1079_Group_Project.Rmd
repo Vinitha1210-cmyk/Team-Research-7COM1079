@@ -1,0 +1,91 @@
+---
+title: "Fertility and Life Expectancy (2021"
+author: "7COM1079 FINAL REPORT"
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+
+# Run the next line ONCE if you don't have ggplot2 and dplyr:
+# install.packages(c("ggplot2","dplyr"))
+
+library(ggplot2)
+library(dplyr)
+
+# 1) Read your CSV file
+data <- read.csv("C:/Users/DELL/Downloads/all_indicators.csv")
+
+# 2) Look at the structure (names of columns)
+names(data)
+head(data)
+summary(data)
+
+
+```
+```{r}
+# Select variables
+analysis_data <- data %>%
+  select(Med_Age.YR2021, Death.YR2021) %>%
+  na.omit()
+
+head(analysis_data)
+summary(analysis_data)
+
+```
+```{r}
+ggplot(analysis_data, aes(x = Med_Age.YR2021, y = Death.YR2021)) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", color = "red") +
+  labs(
+    title = "Correlation Between Median Age (2021) and Death Rate (2021)",
+    x = "Median Age (2021)",
+    y = "Death Rate (2021)"
+  ) +
+  theme_minimal()
+
+```
+```{r}
+ggplot(analysis_data, aes(x = Med_Age.YR2021)) +
+  geom_histogram(binwidth = 2, fill = "skyblue", color = "black") +
+  labs(
+    title = "Distribution of Median Age (2021)",
+    x = "Median Age (2021)",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+
+```
+```{r}
+# Correlation test
+cor_test_result <- cor.test(
+  analysis_data$Med_Age.YR2021,
+  analysis_data$Death.YR2021,
+  method = "pearson"
+)
+
+cor_test_result
+
+```
+```{r}
+model <- lm(Death.YR2021 ~ Med_Age.YR2021, data = analysis_data)
+summary(model)
+
+```
+
+```{r}
+ggsave("scatterplot_corr.png", width = 7, height = 5)
+ggsave("histogram_median_age.png", width = 7, height = 5)
+
+```
+```{r}
+write.csv(analysis_data, "cleaned_dataset.csv", row.names = FALSE)
+
+```
+
